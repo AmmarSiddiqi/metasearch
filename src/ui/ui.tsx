@@ -216,6 +216,8 @@ const Results = ({
                         className="title"
                         dangerouslySetInnerHTML={{ __html: result.title }}
                         href={result.url}
+                        target="_blank" 
+                        rel="noopener noreferrer"
                       />
                       {result.modified ? (
                         <span
