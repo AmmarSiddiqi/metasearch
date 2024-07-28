@@ -1,0 +1,39 @@
+.DEFAULT_GOAL := all
+MAKEFLAGS += --silent
+SHELL = /usr/bin/env bash
+
+# Build and serve. Intended use case: local development
+.PHONY: all
+all: build serve
+
+# Here npx is being used instead of node_modules/bin because it runs binaries without needing to manually navigate to the node_modules/.bin directory. 
+
+# Compile assets. Intended use case: Docker build step
+.PHONY: build
+build: _ts
+	npx uglifyjs -c -m -o dist/ui.js src/ui/ui.js
+	echo 'Compiling Sass...'
+	npx sass --no-source-map -s compressed src/ui/styles.scss dist/styles.css
+
+# Get a Google OAuth refresh token
+.PHONY: oauth
+oauth: _ts
+	node src/oauth.js
+
+# Get a Microsoft Graph OAuth refresh token
+.PHONY: oauth_microsoft
+oauth_microsoft: _ts
+	node src/oauth.microsoft.js
+
+# Install NPM dependencies and compile TypeScript
+.PHONY: _ts
+_ts:
+	echo 'Installing NPM dependencies...'
+	npm ci
+	echo 'Compiling TypeScript...'
+	NODE_OPTIONS=--max_old_space_size=4096 npx tsc
+
+# Serve the application with live reloading
+.PHONY: serve
+serve:
+	npx concurrently "npx tsc --watch" "npx sass --watch src/ui/styles.scss dist/styles.css" "npx nodemon src/index.js"
