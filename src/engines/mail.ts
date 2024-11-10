@@ -22,7 +22,7 @@ const engine: Engine = {
     },
     isSnippetLarge: true,
     name: "Mail",
-    search: async q => {
+    search: async queryString => {
         if (!(client)) {
             throw Error("Engine not initialized");
         }
@@ -31,7 +31,7 @@ const engine: Engine = {
                 {
                     entityTypes: ["message"],
                     query: {
-                        queryString: q
+                        queryString
                     },
                     from: 0,
                     size: 25
